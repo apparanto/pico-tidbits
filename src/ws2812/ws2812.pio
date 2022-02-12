@@ -1,0 +1,70 @@
+.program ws2812
+.side_set 1
+
+.define public T1 2
+.define public T2 5
+.define public T3 3
+
+bitloop:
+    out x, 1        side 0  [T3 - 1] ; 3 cycles '0'
+    jmp !x do_zero  side 1  [T1 - 1] ; 2 cycles '1'
+do_one:
+    jmp bitloop     side 1  [T2 - 1] ; 5 cycles '1' (7 cycles)
+do_zero:
+    jmp bitloop     side 0  [T2 - 1] ; 5 cycles '0' (2 cycles 1, 5 cycles 0)
+
+
+% c-sdk {
+#include "hardware/clocks.h"
+
+static inline void ws2812_program_init(PIO pio, uint sm, uint offset, uint pin, float freq, bool rgbw) {
+
+  
+    // Configure a GPIO for use by PIO. (Set the GPIO function select.)
+    pio_gpio_init(pio, pin);
+
+    // Sets the PIO pin direction of 1 pin starting at pin number pin to out
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+  
+    // Get the default configuration using the generated function for this program 
+    // (this includes things like the .wrap and .side_set configurations from the program)
+    pio_sm_config c = ws2812_program_get_default_config(offset);
+
+    // Sets the side set to write to pins starting at pin 'pin' 
+    // (we say starting at because if you had .side_set 3, 
+    // then it would be outputting values on numbers pin, pin+1, pin+2)
+    sm_config_set_sideset_pins(&c, pin);
+
+    // Configure the OSR. 
+    // False for shift_to_right (i.e. we want to shift out MSB first).
+    // True for autopull. 
+    // 32 or 24 for the number of bits for the autopull threshold,
+    // i.e. the point at which the state machine triggers a refill of the OSR,
+    // depending on whether the LEDs are RGB or RGBW.
+    sm_config_set_out_shift(&c, false, true, rgbw ? 32 : 24);
+
+    // Each state machine has two four-word FIFOs attached to it. 
+    // These can be used for one going in and one coming out. 
+    // However, as we only have data going into our state machine, 
+    // we can join them together to form a single eight-word FIFO.
+    // This gives us a small buffer of time to write data to in order to 
+    // avoid the state machine running out of data and execution stalling.
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_TX);
+
+    // This is the total number of execution cycles to output a single bit
+    int cycles_per_bit = ws2812_T1 + ws2812_T2 + ws2812_T3;
+
+    // Slow the state machine’s execution down, 
+    // based on the system clock speed and the number of execution cycles required per WS2812 data bit,
+    // so that we achieve the correct bit rate.
+    float div = clock_get_hz(clk_sys) / (freq * cycles_per_bit);
+    sm_config_set_clkdiv(&c, div);
+
+    // Load our configuration into the state machine, and go to the start address ( offset)
+    pio_sm_init(pio, sm, offset, &c);
+
+    // And make it go now!
+    pio_sm_set_enabled(pio, sm, true);
+
+}
+%}
