@@ -26,8 +26,8 @@ int main()
     hd44780_clear(lcd);
     hd44780_show_cursor(lcd);
     hd44780_blink_cursor_on(lcd);
-    char c[] = "Hello world!\nWe meet again!";
-    hd44780_put_str(lcd, c, sizeof(c));
+    char str[] = "Hello world!\nWe meet again!";
+    hd44780_put_str(lcd, str);
 
     // Do nothing
     while (true)

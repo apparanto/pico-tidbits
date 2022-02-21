@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 
+
 #include "../dht11/dht11.h"
 #include "../hd44780/hd44780.h"
 
@@ -40,7 +41,9 @@ int main()
 
     dht11_t dht11 = dht11_init(DHT11_PIN);
     hd44780_t hd44780 = setup_lcd();
+    hd44780_put_str(&hd44780, "Initializing...");
 
+    bool initializing = true;
     while (true)
     {
         dht11_read(&dht11);
@@ -49,10 +52,15 @@ int main()
             printf("T: %u.%u°C\n", dht11.temp_int, dht11.temp_dec);
             printf("H: %u.%u%%\n", dht11.humidity_int, dht11.humidity_dec);
 
-            hd44780_cursor_home(&hd44780);
+            if (initializing) {
+                hd44780_clear(&hd44780);
+                initializing = false;
+            } else {
+                hd44780_cursor_home(&hd44780);
+            }
 
             char str[17];
-            hd44780_put_str(&hd44780, "T: ", 3);
+            hd44780_put_str(&hd44780, " T: ");
             hd44780_put_char(&hd44780, 0x30 + (dht11.temp_int / 10)); 
             hd44780_put_char(&hd44780, 0x30 + (dht11.temp_int % 10)); 
             hd44780_put_char(&hd44780, '.');
@@ -60,8 +68,8 @@ int main()
             hd44780_put_char(&hd44780, 0xDF);
             hd44780_put_char(&hd44780, 'C');
 
-            sprintf(str, "\nH:%u.%u ", dht11.humidity_int, dht11.humidity_dec);
-            hd44780_put_str(&hd44780, str, 9);
+            sprintf(str, "\n H: %u.%u ", dht11.humidity_int, dht11.humidity_dec);
+            hd44780_put_str(&hd44780, str);
             hd44780_put_char(&hd44780, 0x25);
 
         }

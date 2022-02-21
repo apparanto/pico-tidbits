@@ -23,6 +23,8 @@ add_subdirectory(src/dht11lcd)
 add_subdirectory(src/pwm)
 add_subdirectory(src/adc)
 add_subdirectory(src/ws2812)
+add_subdirectory(src/usb2uart)
+add_subdirectory(src/sim7080g)
 
 
 add_compile_options(-Wall

@@ -14,6 +14,8 @@
 #ifndef _HD44780_
 #define _HD44780_
 
+#include <string.h>
+
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 
@@ -97,7 +99,7 @@ extern void hd44780_move_cursor(hd44780_t *hd44780, uint cursor_x, uint cursor_y
 extern void hd44780_cursor_home(hd44780_t *hd44780);
 
 extern void hd44780_put_char(hd44780_t *hd44780, uint8_t c);
-extern void hd44780_put_str(hd44780_t *hd44780, uint8_t *str, uint len);
+extern void hd44780_put_str(hd44780_t *hd44780, uint8_t *str);
 
 extern void hd44780_write_cgram(hd44780_t *hd44780);
 

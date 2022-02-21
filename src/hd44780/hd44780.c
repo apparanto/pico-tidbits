@@ -13,7 +13,6 @@
 #include "hd44780.h"
 
 
-
 static inline int hd44780_write(hd44780_t *hd44780, uint8_t *bytes, uint len) {
     return i2c_write_timeout_us(hd44780->i2c, hd44780->addr, bytes, len, true, hd44780->timeout_us);
 }
@@ -141,8 +140,8 @@ void hd44780_put_char(hd44780_t *hd44780, uint8_t c) {
     }
 }
 
-void hd44780_put_str(hd44780_t *hd44780, uint8_t *str, uint len) {
-    for (int i = 0; i < len-1; i++) {
+void hd44780_put_str(hd44780_t *hd44780, uint8_t *str) {
+    for (int i = 0; i < strlen(str); i++) {
         hd44780_put_char(hd44780, str[i]);
     }
 }
