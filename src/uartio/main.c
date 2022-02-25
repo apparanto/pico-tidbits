@@ -9,12 +9,12 @@
  * 
  */
 
-#include "usb2uart.h"
+#include "uartio.h"
 
 int main() {
 
-    usb2uart_t usb2uart = usb2uart_setup(uart0, 0, 1, 115200);
-    usb2uart_start(&usb2uart);
+    uartio_t uartio = uartio_setup(uart0, 0, 1, 115200);
+    uartio_start(&uartio);
 
     return 0;
 }

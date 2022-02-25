@@ -9,7 +9,7 @@
  * 
  */
 
-#include "sim7080g.h"
+#include "sim7080g_network.h"
 
 
 int main() {
@@ -18,7 +18,11 @@ int main() {
     sleep_ms(3000);
     printf("Initializing. Please wait...\n");
     
-    if (!sim7080g_setup(0)) {
+    if (sim7080g_setup(0) 
+        && sim7080g_connect()
+        ) {
+        printf("Initialization completed\n");
+    } else {
         printf("Initialization failed\n");
     }
 

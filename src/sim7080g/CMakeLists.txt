@@ -5,7 +5,12 @@ add_executable(${TIDBIT}_main
 )
 
 add_library(${TIDBIT} STATIC
-        ${TIDBIT}.c
+        ${TIDBIT}_core.c
+        ${TIDBIT}_network.c
+        ${TIDBIT}_ssl.c
+        ${TIDBIT}_tcpudp.c
+        ${TIDBIT}_ntp.c
+        ${TIDBIT}_http.c
 )
 
 target_link_libraries(${TIDBIT}
@@ -15,7 +20,7 @@ target_link_libraries(${TIDBIT}
         hardware_gpio
         hardware_uart
 
-        usb2uart
+        uartio
 )
 
 target_link_libraries(${TIDBIT}_main

@@ -1,4 +1,4 @@
-set(TIDBIT usb2uart)
+set(TIDBIT uartio)
 
 add_executable(${TIDBIT}_main
         main.c

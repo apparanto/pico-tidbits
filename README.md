@@ -23,13 +23,18 @@ This code is developed and tested on a Mac.
 
 ## Available tidbits
 
-- i2c_lcd: control a HD44780 LCD driven by a PCF8574 I2C adapter module
+- hd44780: control a HD44780 LCD driven by a PCF8574 I2C adapter module
 Based on spec sheet: https://www.futurlec.com/Datasheet/LED/HD44780.pdf
 
 - dht11: Read data from a dht11 temperature and humidity sensor
 Based on spec sheet: https://www.mouser.com/datasheet/2/758/DHT11-Technical-Data-Sheet-Translated-Version-1143054.pdf
 
--... [More to come]
+- uartio: uart input output buffering and usb bridge
+Used for having a terminal to uart devices, e.g. modems
+
+- sim7080g: tidbits to do NB-IOT communication via a SIMCOM sim7080g modem.
+Send AT commands, TCP/UDP (SSL) communication, HTTP(S) requests, NTP (to sync the modem clk)
+
 
 
 
