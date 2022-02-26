@@ -31,20 +31,27 @@
 #define SIM7080G_TX_PIN         0
 #define SIM7080G_RX_PIN         1
 #define SIM7080G_PWR_PIN        14
-#define SIM7080G_STARTUP_COUNT  30
+#define SIM7080G_WKU_PIN        17
+#define SIM7080G_STARTUP_COUNT  50
 #define SIM7080G_RESPONSE_OK    "OK"
 
 
 extern uartio_t sim7080g_uartio;
 
 /**
- * @brief Setup the uart and buffer and initialize the modem.
+ * @brief Initialize the uart, buffer and simcom modem.
  * 
  * @param pincode The pincode for the sim, 0 if to be ommitted
- * @return true setup succeeded
- * @return false setup failed
+ * @return true initialisation succeeded
+ * @return false initialisation failed
  */
-extern bool sim7080g_setup(uint pincode);
+extern bool sim7080g_init(uint pincode);
+
+/**
+ * @brief This pulls the power pin hig for 3 seconds and then low for 2.5 seconds
+ * 
+ */
+extern void sim7080g_toggle_power();
 
 /**
  * @brief Send byte array directly to the sim7080g modem via uart0
@@ -95,11 +102,5 @@ extern bool sim7080g_send_at_expect(uint8_t *at_str, uint8_t *expect);
  */
 extern bool sim7080g_send_atf_expect_OK(uint8_t *at_fmt, ...);
 
-/**
- * @brief Start an interactive session where the uartio connected the modem is working as a bridge
- * between the usb stdio and the uart connected to the modem
- * 
- */
-extern void sim7080g_start_interactive();
 
 #endif

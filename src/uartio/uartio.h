@@ -40,7 +40,9 @@ typedef struct uartio {
 
 } uartio_t;
 
-typedef void (*HandleCommand)(uint8_t *command);
+typedef void (*cmd_handler)(uint8_t *cmd);
+
+
 
 #define UARTIO_NULL  (uartio_t){ 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 #define ISUARTIO_NULL(uartio_obj) ((uartio_obj).uart == 0)
@@ -79,10 +81,12 @@ extern void uartio_read_rx_buf(uartio_t *uartio, uint rx_timeout_ms, bool append
 extern void uartio_send_vfmtln(uartio_t *uartio, uint8_t *fmt, va_list args);
 
 /**
- * @brief Start interactive session passing data back and forth between usb and uart
+ * @brief bridge between usb stdio and uart
  * 
- * @param uartio 
+ * @param uartio specifies which uart to connect to
+ * @param cmd_tag the tag for commands to be redirected to the client program instead of the uart
+ * @param handler the function to be invoked when a client command is detected
  */
-extern void uartio_start(uartio_t *uartio);
+extern void uartio_start(uartio_t *uartio, uint8_t *cmd_tag, cmd_handler handler);
 
 #endif //_UARTIO_HEADER

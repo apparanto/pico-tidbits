@@ -22,7 +22,6 @@ bool sim7080g_setup_network()
         sim7080g_send_atf_expect_OK("AT+CFUN=1") &&
         sim7080g_send_atf_expect_OK("ATE0"))
     {
-        sleep_ms(5000);
         return true;
     }
     else
@@ -37,7 +36,7 @@ bool sim7080g_connect_network()
     bool online = false;
 
     // Response time of CGATT is up to 75 seconds!
-    for (uint i = 0; i < 15; i++)
+    for (uint i = 0; i < 20; i++)
     {
         sim7080g_send_atf("AT+CGATT?");
 
@@ -61,7 +60,6 @@ bool sim7080g_connect_network()
         sim7080g_send_atf_expect_OK("AT+CPSI?") &&
         sim7080g_send_atf_expect_OK("AT+COPS?"))
     {
-
         // Retrieve APN
         if (sim7080g_send_atf_expect_OK("AT+CGNAPN"))
         {

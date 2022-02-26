@@ -98,13 +98,14 @@ void uartio_send_vfmtln(uartio_t *uartio, uint8_t *fmt, va_list args)
 
 }
 
-void uartio_start(uartio_t *uartio)
+void uartio_start(uartio_t *uartio, uint8_t *cmd_token, cmd_handler handler)
 {
     uartio_clear_buffers(uartio);
 
     printf("Session started\n> ");
     bool wait_for_response = false;
     uint rx_timeout_ms = UART_CHAR_READ_TIMEOUT_US;
+    uint cmd_token_len = strlen(cmd_token);
     while (true)
     {
         int16_t ch = getchar_timeout_us(100);
@@ -115,14 +116,23 @@ void uartio_start(uartio_t *uartio)
             {
                 if (uartio->tx_idx > 0)
                 {
-                    uartio->tx_buf[uartio->tx_idx++] = '\r';
-                    uartio->tx_buf[uartio->tx_idx++] = '\n';
-                    uartio->tx_buf[uartio->tx_idx] = 0;
-                    uartio_write_tx_buf(uartio);
-                    
-                    wait_for_response = true;
-                    rx_timeout_ms = uartio->rx_timeout_ms;
+                    printf("\n");
+                    // if it is a client command send it to the client
+                    if (strncmp(uartio->tx_buf, cmd_token, cmd_token_len) == 0) {
+                        uartio->tx_buf[uartio->tx_idx] = 0;
+                        handler(uartio->tx_buf);
+                        rx_timeout_ms = UART_CHAR_READ_TIMEOUT_US;
+                    } else {
+                        // send the command to the UART
+                        uartio->tx_buf[uartio->tx_idx++] = '\r';
+                        uartio->tx_buf[uartio->tx_idx++] = '\n';
+                        uartio->tx_buf[uartio->tx_idx] = 0;
+                        uartio_write_tx_buf(uartio);
+                        
+                        uartio_read_rx_buf(uartio, uartio->rx_timeout_ms, false);
+                    }
                     uartio->tx_idx = 0;
+                    wait_for_response = true;
                 }
             } 
             else

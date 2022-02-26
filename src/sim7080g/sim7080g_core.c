@@ -24,10 +24,11 @@ void sim7080g_init_uart()
 
 void sim7080g_setup_power()
 {
-    printf("Toggling modem power\n");
+    printf("Setting up modem power\n");
     gpio_init(SIM7080G_PWR_PIN);
     gpio_set_dir(SIM7080G_PWR_PIN, GPIO_OUT);
     gpio_put(SIM7080G_PWR_PIN, false);
+    sleep_ms(2000);
 }
 
 void sim7080g_toggle_power()
@@ -99,7 +100,6 @@ void sim7080g_send_atf(uint8_t *at_fmt, ...)
 bool sim7080g_check_startup()
 {
     bool ready = false;
-    sim7080g_init_uart();
     for (int i = 0; i < SIM7080G_STARTUP_COUNT; i++)
     {
         if (sim7080g_send_atf_expect_OK("ATE0"))
@@ -111,7 +111,7 @@ bool sim7080g_check_startup()
         else
         {
             printf("SIM7080G Starting up...\n");
-            if (i % (SIM7080G_STARTUP_COUNT / 3) == 0)
+            if (i % (10) == 0)
             {
                 sim7080g_toggle_power();
             }
@@ -133,7 +133,7 @@ bool sim7080g_set_pincode(uint pincode)
     }
 }
 
-bool sim7080g_setup(uint pincode)
+bool sim7080g_init(uint pincode)
 {
     sim7080g_init_uart();
     if (sim7080g_send_atf_expect_OK("ATE0")) {
@@ -143,9 +143,4 @@ bool sim7080g_setup(uint pincode)
         return sim7080g_check_startup() 
             && (pincode == 0 || sim7080g_set_pincode(pincode));
     }
-}
-
-void sim7080g_start_interactive()
-{
-    uartio_start(&sim7080g_uartio);
 }

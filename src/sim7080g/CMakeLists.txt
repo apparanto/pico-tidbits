@@ -11,6 +11,7 @@ add_library(${TIDBIT} STATIC
         ${TIDBIT}_tcpudp.c
         ${TIDBIT}_ntp.c
         ${TIDBIT}_http.c
+        ${TIDBIT}_cmd.c
 )
 
 target_link_libraries(${TIDBIT}
@@ -25,6 +26,10 @@ target_link_libraries(${TIDBIT}
 
 target_link_libraries(${TIDBIT}_main
         ${TIDBIT}
+)
+
+target_include_directories(${TIDBIT} PUBLIC
+        ../uartio
 )
 
 pico_enable_stdio_usb(${TIDBIT}_main 1)
