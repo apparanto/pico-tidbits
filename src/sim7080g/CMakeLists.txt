@@ -12,6 +12,7 @@ add_library(${TIDBIT} STATIC
         ${TIDBIT}_ntp.c
         ${TIDBIT}_http.c
         ${TIDBIT}_cmd.c
+        ${TIDBIT}_sms.c
 )
 
 target_link_libraries(${TIDBIT}
@@ -20,8 +21,9 @@ target_link_libraries(${TIDBIT}
         pico_malloc
         hardware_gpio
         hardware_uart
+        hardware_irq
 
-        uartio
+        uart_io
 )
 
 target_link_libraries(${TIDBIT}_main
@@ -29,7 +31,7 @@ target_link_libraries(${TIDBIT}_main
 )
 
 target_include_directories(${TIDBIT} PUBLIC
-        ../uartio
+        ../uart_io
 )
 
 pico_enable_stdio_usb(${TIDBIT}_main 1)

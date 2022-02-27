@@ -55,7 +55,7 @@ bool sim7080g_http_get(uint8_t *host_url, uint8_t *path)
         if (sim7080g_wait_for_response("+SHREQ:", 30000))
         {
             // Extract the length of the response
-            uint8_t *lenp = strrchr(sim7080g_uartio.rx_buf, ',');
+            uint8_t *lenp = strrchr(sim7080g_io->rx_buf, ',');
             lenp++;
 
             // Read the response
@@ -77,5 +77,5 @@ bool sim7080g_http_get(uint8_t *host_url, uint8_t *path)
 
 bool sim7080g_test_http_get()
 {
-    return sim7080g_http_get("http://api.seniverse.com", "/v3/weather/now.json?key=SwwwfskBjB6fHVRon&location=shenzhen&language=en&unit=c");
+    return sim7080g_http_get("http://httpbin.org", "/get");
 }

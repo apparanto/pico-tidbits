@@ -23,7 +23,7 @@
 #include "hardware/uart.h"
 #include "hardware/gpio.h"
 
-#include "../uartio/uartio.h"
+#include "../uart_io/uart_io.h"
 
 
 #define SIM7080G_UART           uart0
@@ -36,7 +36,7 @@
 #define SIM7080G_RESPONSE_OK    "OK"
 
 
-extern uartio_t sim7080g_uartio;
+extern uart_io_t *sim7080g_io;
 
 /**
  * @brief Initialize the uart, buffer and simcom modem.
@@ -58,7 +58,7 @@ extern void sim7080g_toggle_power();
  * 
  * @param data pointer to byte array
  * @param len length of byte array
- * @return true write succeeds within timeout configured in uartio
+ * @return true write succeeds within timeout configured in uart_io
  * @return false write fails within timeout
  */
 extern bool sim7080g_send(uint8_t *data, size_t len);
@@ -73,7 +73,7 @@ extern bool sim7080g_send(uint8_t *data, size_t len);
 extern void sim7080g_send_atf(uint8_t *at_fmt, ...);
 
 /**
- * @brief Waits for a specific response to arrive in the uartio's rx buffer 
+ * @brief Waits for a specific response to arrive in the uart_io's rx buffer 
  * 
  * @param expected_response the response that is expected
  * @param rx_timeout_ms the max time in milliseconds to wait for the expected response to arrive
@@ -87,8 +87,8 @@ extern bool sim7080g_wait_for_response(uint8_t *expected_response, uint rx_timeo
  * 
  * @param at_str the AT command to send to the modem
  * @param expect the expected response
- * @return true if the expected response arrived within the tx timeout of the uartio
- * @return false if the expected response did not arrive within the tx timeout of the uartio
+ * @return true if the expected response arrived within the tx timeout of the uart_io
+ * @return false if the expected response did not arrive within the tx timeout of the uart_io
  */
 extern bool sim7080g_send_at_expect(uint8_t *at_str, uint8_t *expect);
 

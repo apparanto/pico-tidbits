@@ -13,12 +13,12 @@
 
 #include "sim7080g_core.h"
 
-uartio_t sim7080g_uartio = UARTIO_NULL;
+uart_io_t *sim7080g_io = NULL;
 
 void sim7080g_init_uart()
 {
-    printf("Setting up uartio\n");
-    sim7080g_uartio = uartio_setup(SIM7080G_UART, SIM7080G_TX_PIN, SIM7080G_RX_PIN, SIM7080G_BAUD);
+    printf("Setting up uart_io\n");
+    sim7080g_io = uart_io_init(SIM7080G_UART, SIM7080G_TX_PIN, SIM7080G_RX_PIN, SIM7080G_BAUD);
     uart_set_hw_flow(SIM7080G_UART, false, false);
 }
 
@@ -44,7 +44,7 @@ void sim7080g_toggle_power()
 
 bool sim7080g_send(uint8_t *data, size_t len)
 {
-    uart_write_blocking(sim7080g_uartio.uart, data, len);
+    uart_write_blocking(sim7080g_io->uart, data, len);
 }
 
 bool sim7080g_wait_for_response(uint8_t *expected_response, uint rx_timeout_ms)
@@ -54,9 +54,9 @@ bool sim7080g_wait_for_response(uint8_t *expected_response, uint rx_timeout_ms)
     bool append = false;
     uint8_t *strp = NULL;
     do {
-        uartio_read_rx_buf(&sim7080g_uartio, rx_timeout_ms, append);
+        uart_io_read_rx_buf(sim7080g_io, rx_timeout_ms, append);
         append = true;
-    } while (((strp = strstr(sim7080g_uartio.rx_buf, expected_response)) == NULL) 
+    } while (((strp = strstr(sim7080g_io->rx_buf, expected_response)) == NULL) 
         && time_us_64() < timeout_time);
 
     return (strp != NULL);
@@ -66,20 +66,20 @@ bool sim7080g_send_atf_expect_OK(uint8_t *at_fmt, ...)
 {
     va_list args;
     va_start(args, at_fmt);
-    uartio_send_vfmtln(&sim7080g_uartio, at_fmt, args);
+    uart_io_send_vfmtln(sim7080g_io, at_fmt, args);
     va_end(args);
 
-    return sim7080g_wait_for_response(SIM7080G_RESPONSE_OK, sim7080g_uartio.rx_timeout_ms);
+    return sim7080g_wait_for_response(SIM7080G_RESPONSE_OK, sim7080g_io->rx_timeout_ms);
 }
 
 bool sim7080g_send_atf_expect(uint8_t *at_fmt, uint8_t *expect, ...)
 {
     va_list args;
     va_start(args, expect);
-    uartio_send_vfmtln(&sim7080g_uartio, at_fmt, args);
+    uart_io_send_vfmtln(sim7080g_io, at_fmt, args);
     va_end(args);
 
-    return sim7080g_wait_for_response(expect, sim7080g_uartio.rx_timeout_ms);
+    return sim7080g_wait_for_response(expect, sim7080g_io->rx_timeout_ms);
 }
 
 bool sim7080g_send_at_expect(uint8_t *at_str, uint8_t *expect)
@@ -91,7 +91,7 @@ void sim7080g_send_atf(uint8_t *at_fmt, ...)
 {
     va_list args;
     va_start(args, at_fmt);
-    uartio_send_vfmtln(&sim7080g_uartio, at_fmt, args);
+    uart_io_send_vfmtln(sim7080g_io, at_fmt, args);
     va_end(args);
 }
 

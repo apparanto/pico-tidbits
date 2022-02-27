@@ -64,8 +64,8 @@ bool sim7080g_connect_network()
         if (sim7080g_send_atf_expect_OK("AT+CGNAPN"))
         {
 
-            // Extract APN from response in uartio rx buffer
-            uint8_t *apn_str_start = strstr(sim7080g_uartio.rx_buf, ",\"") + 2;
+            // Extract APN from response in uart_io rx buffer
+            uint8_t *apn_str_start = strstr(sim7080g_io->rx_buf, ",\"") + 2;
             uint8_t *apn_str_end = strstr(apn_str_start, "\"");
             *apn_str_end = 0;
             printf("APN: %s\n", apn_str_start);

@@ -9,12 +9,12 @@
  * 
  */
 
-#include "uartio.h"
+#include "uart_io.h"
 
 int main() {
 
-    uartio_t uartio = uartio_setup(uart0, 0, 1, 115200);
-    uartio_start(&uartio);
+    uart_io_t *uart_io = uart_io_init(uart0, 0, 1, 115200);
+    uart_io_start(uart_io, NULL, NULL);
 
     return 0;
 }

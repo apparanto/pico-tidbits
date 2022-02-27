@@ -16,7 +16,7 @@
 #include "sim7080g_http.h"
 
 /**
- * @brief Start an interactive session where the uartio connected the modem is working as a bridge
+ * @brief Start an interactive session where the uart_io connected the modem is working as a bridge
  * between the usb stdio and the uart connected to the modem. 
  * When the cmd_token is detected in the USB stdin it is sent to the client program by invoking the cmd_handler
  * 

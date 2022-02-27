@@ -23,7 +23,7 @@ add_subdirectory(src/dht11lcd)
 add_subdirectory(src/pwm)
 add_subdirectory(src/adc)
 add_subdirectory(src/ws2812)
-add_subdirectory(src/uartio)
+add_subdirectory(src/uart_io)
 add_subdirectory(src/sim7080g)
 
 

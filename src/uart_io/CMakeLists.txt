@@ -1,4 +1,4 @@
-set(TIDBIT uartio)
+set(TIDBIT uart_io)
 
 add_executable(${TIDBIT}_main
         main.c

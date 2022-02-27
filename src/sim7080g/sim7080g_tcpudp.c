@@ -74,7 +74,7 @@ bool sim7080g_test_tcp()
         {
             if (sim7080g_send_at_expect("AT+CARECV=0,100", "DayTime Server Starts"))
             {
-                printf("Buffer contents: %s\n", sim7080g_uartio.rx_buf);
+                printf("Buffer contents: %s\n", sim7080g_io->rx_buf);
 
                 result = true;
                 break;
