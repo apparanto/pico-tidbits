@@ -267,6 +267,8 @@ void uart_io_start(uart_io_t *uart_io, uint8_t *cmd_token, cmd_handler handler)
                     }
                     uart_io_enable_irq(uart_io);
                     uart_io->tx_idx = 0;
+
+                    printf("> ");
                 }
             }
             else

@@ -9,14 +9,21 @@
  * 
  */
 
+#include <time.h>
+
+
 #include "sim7080g_cmd.h"
 
 
 int main() {
 
     stdio_init_all();
-    sleep_ms(1000);
+    sleep_ms(3000);
     printf("Initializing. Please wait...\n");
+
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    printf("%d-%02d-%02d %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
     
     if (sim7080g_init(0)) {
         printf("Initialization succesful\n");
