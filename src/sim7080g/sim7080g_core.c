@@ -3,12 +3,12 @@
  * @author Robert Portier (robert.portier@apparanto.com)
  * @brief Functions to setup uart0, buffer and initialize the sim7080g.
  * Also provides functions to send AT commands and retrieve the response.
- * 
+ *
  * @version 0.1
  * @date 2022-02-23
- * 
+ *
  * @copyright Copyright (c) 2022
- * 
+ *
  */
 
 #include "sim7080g_core.h"
@@ -49,15 +49,15 @@ bool sim7080g_send(uint8_t *data, size_t len)
 
 bool sim7080g_wait_for_response(uint8_t *expected_response, uint rx_timeout_ms)
 {
-    //printf("Expecting: [%s]\n", expected_response);
+    // printf("Expecting: [%s]\n", expected_response);
     uint64_t timeout_time = time_us_64() + rx_timeout_ms * 1000;
     bool append = false;
     uint8_t *strp = NULL;
-    do {
+    do
+    {
         uart_io_read_rx_buf(sim7080g_io, rx_timeout_ms, append);
         append = true;
-    } while (((strp = strstr(sim7080g_io->rx_buf, expected_response)) == NULL) 
-        && time_us_64() < timeout_time);
+    } while (((strp = strstr(sim7080g_io->rx_buf, expected_response)) == NULL) && time_us_64() < timeout_time);
 
     return (strp != NULL);
 }
@@ -136,11 +136,23 @@ bool sim7080g_set_pincode(uint pincode)
 bool sim7080g_init(uint pincode)
 {
     sim7080g_init_uart();
-    if (sim7080g_send_atf_expect_OK("ATE0")) {
+    if (sim7080g_send_atf_expect_OK("ATE0"))
+    {
         return pincode == 0 || sim7080g_set_pincode(pincode);
-    } else {
-        sim7080g_setup_power();
-        return sim7080g_check_startup() 
-            && (pincode == 0 || sim7080g_set_pincode(pincode));
     }
+    else
+    {
+        sim7080g_setup_power();
+        return sim7080g_check_startup() && (pincode == 0 || sim7080g_set_pincode(pincode));
+    }
+}
+
+bool sim7080g_disable_uart_irq()
+{
+    uart_io_disable_irq(sim7080g_io);
+}
+
+bool sim7080g_enable_uart_irq()
+{
+    uart_io_enable_irq(sim7080g_io);
 }

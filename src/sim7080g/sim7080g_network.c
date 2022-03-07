@@ -16,7 +16,10 @@ bool sim7080g_setup_network()
 {
     printf("Setting up network\n");
 
-    if (sim7080g_send_atf_expect_OK("AT+CFUN=0") &&
+    uint max_try = 3;
+    while (!sim7080g_send_atf_expect_OK("AT+CFUN=0") && max_try--);
+
+    if (max_try &&
         sim7080g_send_atf_expect_OK("AT+CNMP=2") &&
         sim7080g_send_atf_expect_OK("AT+CMNB=3") &&
         sim7080g_send_atf_expect_OK("AT+CFUN=1") &&

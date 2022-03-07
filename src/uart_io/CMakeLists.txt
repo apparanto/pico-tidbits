@@ -14,6 +14,8 @@ target_link_libraries(${TIDBIT}
         pico_malloc
         hardware_gpio
         hardware_uart
+        hardware_rtc
+        hardware_timer
 )
 
 target_link_libraries(${TIDBIT}_main

@@ -33,7 +33,9 @@ Based on spec sheet: https://www.mouser.com/datasheet/2/758/DHT11-Technical-Data
 Used for having a terminal to uart devices, e.g. modems
 
 - sim7080g: tidbits to do NB-IOT communication via a SIMCOM sim7080g modem.
-Send AT commands, TCP/UDP (SSL) communication, HTTP(S) requests, NTP (to sync the modem clk)
+Send AT commands, TCP/UDP (SSL) communication, HTTP(S) requests, NTP (to sync the modem clk).
+Execute HLC (Higher level commands), #<cmd>, e.g. #? for a list of HLCs.
+
 
 
 

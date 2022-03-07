@@ -15,7 +15,7 @@
 bool sim7080g_sync_clock_ntp(uint8_t *ntp_server, uint timezone_offset)
 {
     if (sim7080g_send_atf_expect_OK("AT+CNTP=\"%s\",%u,0,2", ntp_server, timezone_offset * 4)) {
-        return sim7080g_send_atf_expect_OK("AT+CNTP");
+        return sim7080g_send_at_expect("AT+CNTP", "+CNTP");
     }
     return false;
 }

@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <time.h>
 
 #include "pico/stdlib.h"
 #include "pico/stdio.h"
@@ -24,6 +25,8 @@
 #include "hardware/gpio.h"
 #include "hardware/irq.h"
 #include "hardware/uart.h"
+#include "hardware/rtc.h"
+#include "hardware/timer.h"
 
 
 typedef struct uart_io {
@@ -85,5 +88,8 @@ extern void uart_io_send_vfmtln(uart_io_t *uart_io, uint8_t *fmt, va_list args);
  * @param handler the function to be invoked when a client command is detected
  */
 extern void uart_io_start(uart_io_t *uart_io, uint8_t *cmd_tag, cmd_handler handler);
+
+extern void uart_io_enable_irq(uart_io_t *uart_io);
+extern void uart_io_disable_irq(uart_io_t *uart_io);
 
 #endif //_UARTIO_HEADER

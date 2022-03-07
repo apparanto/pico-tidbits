@@ -11,19 +11,26 @@
 
 #include "sim7080g_cmd.h"
 
-#define CMD_TOKEN               "#"
+#include "hardware/rtc.h"
+#include "pico/util/datetime.h"
 
-#define CMD_INIT                "#IN"
-#define CMD_TOGGLE_POWER        "#TP"
-#define CMD_CONNECT             "#CO"
-#define CMD_UE_SYS_INF          "#US"
-#define CMD_SYNC_NTP            "#ST"
-#define CMD_TEST_HTTP_GET       "#THG"
-#define CMD_POWER_DOWN          "#PD"
+#define CMD_TOKEN "#"
 
-#define CMD_LIST                "#?"
+#define CMD_INIT "#IN"
+#define CMD_TOGGLE_POWER "#TP"
+#define CMD_CONNECT "#CO"
+#define CMD_UE_SYS_INF "#US"
+#define CMD_SYNC_NTP "#ST"
+#define CMD_TEST_HTTP_GET "#THG"
+#define CMD_POWER_DOWN "#PD"
+
+#define CMD_LIST "#?"
 
 #define HANDLERS_LEN_INC 10
+
+// The length of the date time string in the AT+CNTP response must be 19 characters
+// E.g. +CNTP: 1,"2022/03/01,22:02:40"
+#define MAX_CNTP_DATETIME_LEN 19
 
 typedef struct
 {
@@ -44,7 +51,7 @@ uint8_t *get_next_cmd_token(uint8_t *cmd, uint8_t *prev_token)
     static uint8_t *token_buf = NULL;
     static uint max_token_length = 0;
 
-    uint8_t *cmd_token_ptr = cmd; // Points to a token in the command string
+    uint8_t *cmd_token_ptr = cmd;  // Points to a token in the command string
     uint8_t *token_buf_ptr = NULL; // Point to a location in the token buffer
 
     // If there is a previous token used from the cmd, look it up and skip it.
@@ -80,7 +87,8 @@ uint8_t *get_next_cmd_token(uint8_t *cmd, uint8_t *prev_token)
     }
 
     // Copy the next token to token_buf
-    do {
+    do
+    {
         *token_buf_ptr++ = *cmd_token_ptr++;
     } while (*cmd_token_ptr != 0);
 
@@ -116,11 +124,61 @@ void cmd_handler_sync_ntp(uint8_t *cmd)
 {
     int tz_offset = 0;
 
-    uint8_t *arg = get_next_cmd_token(cmd, NULL );
-    if (arg) {
+    uint8_t *arg = get_next_cmd_token(cmd, NULL);
+    if (arg)
+    {
         tz_offset = atoi(arg);
     }
-    sim7080g_sync_clock_ntp("ntp.time.nl", tz_offset);
+
+    if (sim7080g_sync_clock_ntp("ntp.time.nl", tz_offset))
+    {
+        char *ptr_1 = sim7080g_io->rx_buf;
+        char *ptr_2 = ptr_1;
+        while (*ptr_1 != '"' && *ptr_1 != 0 && ptr_1 < (char *)(sim7080g_io->rx_buf + MAX_CNTP_DATETIME_LEN + 1))
+        {
+            ptr_1++;
+        }
+        // The AT+CLCK? date time response is enclosed in double quotes, e.g.: "2022/03/01,21:28:54"
+        // printf("start char: '%c' - end-char: '%c')\n", *ptr_1, *(ptr_1 + MAX_CNTP_DATETIME_LEN + 1));
+        if ((*ptr_1) == '\"' && (*(ptr_1 + MAX_CNTP_DATETIME_LEN + 1)) == '\"')
+        {
+            long year = strtol(ptr_1 + 1, &ptr_2, 10);
+            long month = strtol(ptr_2 + 1, &ptr_1, 10);
+            long day = strtol(ptr_1 + 1, &ptr_2, 10);
+            long hour = strtol(ptr_2 + 1, &ptr_1, 10);
+            long min = strtol(ptr_1 + 1, &ptr_2, 10);
+            long sec = strtol(ptr_2 + 1, &ptr_1, 10);
+            long tz = strtol(ptr_1 + 1, &ptr_2, 10);
+            printf("Parsed date time: %04u-%02u-%02u %02u:%02u:%02u\n", year, month, day, hour, min, sec);
+
+            int d = day;
+            int m = month;
+            int y = year;
+
+            int dotw = (d += m < 3 ? y-- : y - 2, 23 * m / 9 + d + 4 + y / 4 - y / 100 + y / 400) % 7;
+            datetime_t t = {
+                .year = year,
+                .month = month,
+                .day = day,
+                .dotw = dotw,
+                .hour = hour,
+                .min = min,
+                .sec = sec};
+            rtc_init();
+            rtc_set_datetime(&t);
+
+            char datetime_buf[256];
+            char *datetime_str = &datetime_buf[0];
+            sleep_ms(1000);
+            rtc_get_datetime(&t);
+            datetime_to_str(datetime_str, sizeof(datetime_buf), &t);
+            printf("\r%s\n", datetime_str);
+        }
+        else
+        {
+            printf("date time not found in %s (end-char: '%c')\n", ptr_1, *(ptr_1 + MAX_CNTP_DATETIME_LEN + 1));
+        }
+    }
 }
 
 void cmd_handler_test_http(uint8_t *cmd)

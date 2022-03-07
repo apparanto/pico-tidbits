@@ -103,4 +103,21 @@ extern bool sim7080g_send_at_expect(uint8_t *at_str, uint8_t *expect);
 extern bool sim7080g_send_atf_expect_OK(uint8_t *at_fmt, ...);
 
 
+/**
+ * @brief Disable the rx irq of the modem's uart
+ * 
+ * @return true 
+ * @return false 
+ */
+extern bool sim7080g_disable_uart_irq();
+
+/**
+ * @brief Enable the uart rx irq
+ * 
+ * @return true 
+ * @return false 
+ */
+extern bool sim7080g_enable_uart_irq();
+
+
 #endif

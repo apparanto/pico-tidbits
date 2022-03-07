@@ -22,6 +22,7 @@ target_link_libraries(${TIDBIT}
         hardware_gpio
         hardware_uart
         hardware_irq
+        hardware_rtc
 
         uart_io
 )

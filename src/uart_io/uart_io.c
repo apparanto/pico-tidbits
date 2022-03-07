@@ -53,7 +53,6 @@ void uart_io_setup_irq_handler(uart_io_t *uart_io)
     uart_set_irq_enables(uart, true, false);
 }
 
-
 void uart_io_enable_irq(uart_io_t *uart_io)
 {
     uart_inst_t *uart = uart_io->uart;
@@ -70,7 +69,6 @@ void uart_io_enable_irq(uart_io_t *uart_io)
     uart_set_irq_enables(uart, true, false);
 }
 
-
 void uart_io_disable_irq(uart_io_t *uart_io)
 {
     uart_inst_t *uart = uart_io->uart;
@@ -86,7 +84,6 @@ void uart_io_disable_irq(uart_io_t *uart_io)
     }
     uart_set_irq_enables(uart, false, false);
 }
-
 
 void uart_io_setup_uart(uart_io_t *uart_io, uint uart_tx_pin, uint uart_rx_pin, uint baudrate)
 {
@@ -219,19 +216,34 @@ void uart_io_send_vfmtln(uart_io_t *uart_io, uint8_t *fmt, va_list args)
     uart_io_write_tx_buf(uart_io);
 }
 
+void print_prompt()
+{
+    if (rtc_running())
+    {
+        datetime_t t;
+        rtc_get_datetime(&t);
+        printf("%04u-%02u-%02u %02u:%02u:%02u > ", t.year, t.month, t.day, t.hour, t.min, t.sec);
+    }
+    else
+    {
+        printf("> ");
+    }
+}
+
 /**
  * @brief Start bridging the usb and uart
- * 
- * @param uart_io 
- * @param cmd_token 
- * @param handler 
+ *
+ * @param uart_io
+ * @param cmd_token
+ * @param handler
  */
 void uart_io_start(uart_io_t *uart_io, uint8_t *cmd_token, cmd_handler handler)
 {
     uart_io_clear_buffers(uart_io);
     uart_io_setup_irq_handler(uart_io);
 
-    printf("Session started\n> ");
+    printf("Session started\n");
+    print_prompt();
     bool wait_for_response = false;
     uint rx_timeout_ms = UART_CHAR_READ_TIMEOUT_US;
     uint cmd_token_len = strlen(cmd_token);
@@ -265,10 +277,10 @@ void uart_io_start(uart_io_t *uart_io, uint8_t *cmd_token, cmd_handler handler)
                         // Wait for an answer;
                         uart_io_read_rx_buf(uart_io, uart_io->rx_timeout_ms, true);
                     }
-                    uart_io_enable_irq(uart_io);
                     uart_io->tx_idx = 0;
+                    uart_io_enable_irq(uart_io);
 
-                    printf("> ");
+                    print_prompt();
                 }
             }
             else
